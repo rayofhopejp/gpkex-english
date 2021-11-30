@@ -1,2 +1,4 @@
 .stack-work/
 *~
+data/*
+*/Config.hs

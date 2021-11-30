@@ -25,6 +25,9 @@ source-repository head
 
 library
   exposed-modules:
+      Config
+      Config_template
+      GP
       Lib
   other-modules:
       Paths_gpkex_english
@@ -36,13 +39,13 @@ library
     , containers
     , directory
     , genprog ==0.1.0.2
+    , split
     , syb
   default-language: Haskell2010
 
 executable gpkex-english-exe
   main-is: Main.hs
   other-modules:
-      Main2
       Paths_gpkex_english
   hs-source-dirs:
       app
@@ -54,24 +57,7 @@ executable gpkex-english-exe
     , directory
     , genprog ==0.1.0.2
     , gpkex-english
-    , syb
-  default-language: Haskell2010
-
-executable gpkex-english-exe2
-  main-is: Main2.hs
-  other-modules:
-      Main
-      Paths_gpkex_english
-  hs-source-dirs:
-      app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is Main2
-  build-depends:
-      MonadRandom
-    , base >=4.7 && <5
-    , containers
-    , directory
-    , genprog ==0.1.0.2
-    , gpkex-english
+    , split
     , syb
   default-language: Haskell2010
 
@@ -90,5 +76,6 @@ test-suite gpkex-english-test
     , directory
     , genprog ==0.1.0.2
     , gpkex-english
+    , split
     , syb
   default-language: Haskell2010
