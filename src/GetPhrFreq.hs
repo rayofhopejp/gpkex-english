@@ -17,41 +17,15 @@ import NLP.POS
 stemN = 5 :: Int
 takeNumber = 960 :: Int
 
-getDict :: String -> M.Map String [String] -> M.Map String [String]
-getDict s m = M.insert fi le m
-  where w = words s
-        le = filter (\w' -> (isUpper $ head w') && length w' == 1) $ tail w
-        fi = map toLower $ head w
+-- todo:見出し語にする操作
+lemmatize :: [String] ->　[String]
+lemmatize a = a
 
-getLemma :: String -> M.Map String String -> M.Map String String
-getLemma s m = M.insert fi le m
-  where w = words s
-        fi = map toLower $ head w
-        le = map (\c -> toLower c) $ head $ tail $ w
-
-lemmatize :: [String] -> M.Map String String -> [String]
-lemmatize ws m = map (\w -> solve w (M.lookup w m)) ws
-  where solve w (Nothing) = w
-        solve _ (Just a)  = a
-
-
-getComb :: [String] -> [String] -> M.Map String [String] -> [String]
-getComb [] l _ = l
-getComb ss [] m = getComb (tail ss) el m
-  where el = fin $ M.lookup (head ss) m
-        fin (Just x) = x
-        fin (Nothing) = ["X"]
-getComb ss l m = getComb (tail ss) con m
-  where el = fin $ M.lookup (head ss) m
-        fin (Just x) = x
-        fin (Nothing) = ["X"]
-        con = concat $ map (\el' -> map (\l' -> l' ++ el') l) el
-
+-- todo:後でPOSでフィルターをかける
+-- ここで品詞分解を使いたい
 posPat = ["N","AN","NN","X","NSN","V"]
-
-filterPOS :: [String] -> M.Map String [String] -> Bool
-filterPOS phr m = any (\pat' -> elem pat' posPat) pat
-  where pat = getComb phr [] m
+filterPOS :: [String] -> Bool
+filterPOS _ = True
 
 takeTuple :: [String] -> [[String]]
 takeTuple [] = []
@@ -62,6 +36,7 @@ takeTuple w
  | otherwise = [w]
   where l = length w
 
+-- ,.!とかで区切って小文字にする(問題なし)
 splitText :: String -> String -> [String]
 splitText word []     = [word]
 splitText word (t:ts)
@@ -70,6 +45,7 @@ splitText word (t:ts)
   | isSpace t = splitText (word ++ " ") ts
   | otherwise = splitText (word ++ [toLower t]) ts
 
+-- "This is Text. Hello, boys" -> [["this","is","text"],["this","is"],["this"],["is","text"],["is"],["text"],["hello"],["boys"]]
 makeTuples :: String -> [[String]]
 makeTuples = concat . map takeTuple . map words . splitText "" . filter (\x -> not (elem x "€—£§«»<@♦¬°►•[_{„¥©>^~■®▼]"))
 
@@ -89,19 +65,13 @@ stem xs     = map (take 5) xs
 getWordFreq :: [[String]] -> M.Map [String] Int
 getWordFreq = foldl (\map key -> M.insert (stem key) 1 map) M.empty
 
--- タイトル.テキストの形にして返す。
-getTextOnly :: String -> String
-getTextOnly s = ttl ++ " . " ++ txt
-  where txt = head $ splitOn "</body>" $ last $ splitOn "<body>" s
-        ttl = head $ splitOn "</title>" $ last $ splitOn "<title>" s
-
 filterFiles [] = error "empty folder"
-filterFiles fs = map (\f -> inDir ++ f) $ sort $ filter (\f -> isSuffixOf ".xml" f) fs
+filterFiles fs = map (\f -> inDir ++ f) $ sort $ filter (\f -> isSuffixOf ".txt" f) fs
 
-getFileText stopW lem lemmas m' fn = do
-  s <- readFile fn
-  m <- m'
-  let nm = getWordFreq $ map (\ph -> lemmatize ph lemmas) $ filter (\ph -> filterPOS ph lem) $ filter (removeStop stopW) $ makeTuples $ getTextOnly s
+getFileText stopW m' fn = do
+  s <- readFile fn -- "this is document !"とかを読む
+  m <- m' --多分これは変えないですむ
+  let nm = getWordFreq $ map (\ph -> lemmatize ph) $ filter (\ph -> filterPOS ph) $ filter (removeStop stopW) $ makeTuples $ s
   return $ M.unionWith (+) m nm
 
 -- main
@@ -109,14 +79,10 @@ runGetPhrFreq :: IO ()
 runGetPhrFreq = do
   sws <- readFile stopWordFile
   let stopW = S.fromList $ lines sws -- stopwordsのsetを作る
-  pos <- readFile morphLexicon
-  -- morphlexiconの各行についてリスト化して左から畳み込みして辞書を作る感じ？
-  let lem = foldl (\m a' -> (getDict a' m)) M.empty $ lines pos
-  let lemmas = foldl (\m a' -> (getLemma a' m)) M.empty $ lines pos
   fns <- getDirectoryContents inDir
   -- xmlファイルのみを抽出
   let a = take takeNumber $ filterFiles fns
-  let b = foldl (getFileText stopW lem lemmas) emptyMap a
+  let b = foldl (getFileText stopW) emptyMap a
   b' <- b
   writeFile "phraseFreq.txt" $ show $ M.toList b'
 

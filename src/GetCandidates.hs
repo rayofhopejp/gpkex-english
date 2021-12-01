@@ -50,10 +50,9 @@ getLemma s m = M.insert fi le m
         fi = map toLower $ head w
         le = map (\c -> toLower c) $ head $ tail $ w
 
-lemmatize :: [String] -> M.Map String String -> [String]
-lemmatize ws m = map (\w -> solve w (M.lookup w m)) ws
-  where solve w (Nothing) = w
-        solve _ (Just a)  = a
+-- todo:見出し語にする操作
+lemmatize :: [String] ->　[String]
+lemmatize a = a
 
 
 getComb :: [String] -> [String] -> M.Map String [String] -> [String]
@@ -68,11 +67,11 @@ getComb ss l m = getComb (tail ss) con m
         fin (Nothing) = ["X"]
         con = concat $ map (\el' -> map (\l' -> l' ++ el') l) el
 
+-- todo:後でPOSでフィルターをかける
+-- ここで品詞分解を使いたい
 posPat = ["N","AN","NN","X","NSN","V"]
-
-filterPOS :: [String] -> M.Map String [String] -> Bool
-filterPOS phr m = any (\pat' -> elem pat' posPat) pat
-  where pat = getComb phr [] m
+filterPOS :: [String] -> Bool
+filterPOS _ = True
   
 
 splitText :: String -> String -> [String]
@@ -133,8 +132,8 @@ onlyOneword m dfm l = M.foldrWithKey (\k o s -> S.insert (tfidf k o,w o) s) S.em
         getdfm k (Nothing)    = error $ "only" ++ show k
         getdfm k (Just a)     = a
 
-makeCandidates :: M.Map [String] Phrase -> S.Set String -> M.Map [String] Int -> [[String]] -> Int -> M.Map [String] Candidate
-makeCandidates phrases toponeword dfm title doclen = M.mapWithKey (\k a -> mkC k a) phrases
+makeCandidates :: M.Map [String] Phrase -> S.Set String -> M.Map [String] Int -> Int -> M.Map [String] Candidate
+makeCandidates phrases toponeword dfm doclen = M.mapWithKey (\k a -> mkC k a) phrases
   where tf (Phrase _ l)       = (fromIntegral $ length l) / (fromIntegral doclen)
         idf k                 = (fromIntegral $ takeNumber) / (fromIntegral $ getdfm k $ M.lookup k dfm)
         getdfm k (Nothing)    = error $ show k
@@ -149,7 +148,7 @@ makeCandidates phrases toponeword dfm title doclen = M.mapWithKey (\k a -> mkC k
         rare k                | length k == 1 = length $ filter (\k' -> S.member k' toponeword) k
                               | otherwise     = length $ filter (\k' -> S.member k' toponeword') k
         toponeword'           = S.map (\str -> take 5 str) toponeword
-        titl k                = if elem k title then 1 else 0
+        titl k                = 0 --todo:titleをCandidateから消す
         orig (Phrase w _)     = unwords w
         mkC k a = Candidate (tf a) (idf k) ((tf a) * log(idf k)) (cfirst a) (clast a) (first a) (secon a) (third a) (numb k) (rare k) (titl k) (orig a)
         
@@ -159,27 +158,23 @@ takeBest s = S.fromList $ map (\(f,s') -> s') $ take rareNumber $ reverse $ S.to
 -- main
 runGetCandidates = do
   sws <- readFile stopWordFile
-  pos <- readFile morphLexicon
-  let lem = foldl (\m a' -> (getDict a' m)) M.empty $ lines pos
-  let lemmas = foldl (\m a' -> (getLemma a' m)) M.empty $ lines pos
   let stopW = S.fromList $ lines sws
   fns <- getDirectoryContents inDirCandidates
   s' <- readFile "phraseFreq.txt"
-  let pfq = M.fromList $ read s'
+  let pfq = M.fromList $ read s' -- key:["apple","watch"] value:1
   let a = take takeNumber $ filterFiles fns
-  forM a (processFiles stopW lem lemmas pfq)
+  forM a (processFiles stopW pfq)
+  return ()
 
 filterFiles [] = error "empty folder"
-filterFiles fs = map (\f -> inDirCandidates ++ f) $ sort $ filter (\f -> isSuffixOf ".xml" f) fs
+filterFiles fs = map (\f -> inDirCandidates ++ f) $ sort $ filter (\f -> isSuffixOf ".txt" f) fs
 
-processFiles stopW lem lemmas pfq fn = do
+processFiles stopW pfq fn = do
   s <- readFile fn
-  let ttl = getTitle s
-  let txt = ttl ++ " . " ++ getTextOnly s
-  let phr = getPhrases $ map (\ph -> lemmatize ph lemmas) $ filter (\ph -> filterPOS ph lem) $ filter (removeStop stopW) $ makeTuples txt
+  let phr = getPhrases $ map (\ph -> lemmatize ph) $ filter (\ph -> filterPOS ph) $ filter (removeStop stopW) $ makeTuples s
   let len = M.size phr
   let owp = onlyOneword phr pfq len
-  let can = makeCandidates phr (takeBest owp) pfq (map (\ph -> lemmatize ph lemmas) $ filter (\ph -> filterPOS ph lem) $ filter (removeStop stopW) $ makeTuples ttl) len
+  let can = makeCandidates phr (takeBest owp) pfq len
   let nfn = outDirCandidates ++ (snd $ splitFileName fn)
   writeFile nfn $ show $  M.toList can
 
