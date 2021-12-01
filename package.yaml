@@ -26,6 +26,7 @@ dependencies:
 - containers
 - directory
 - split
+- chatter
 
 library:
   source-dirs: src

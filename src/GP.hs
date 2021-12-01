@@ -190,14 +190,9 @@ newFileName' fs = newFileName $ filter (\f -> isSuffixOf ".txt" f) fs
 processFiles fn = do
   s1 <- readFile $ inDirP ++ fn
   s2 <- readFile $ inDirK ++ fn
-  let kwrds = map (splitOn " ") . splitOn "\n" $ s2
+  let kwrds = read s2 :: [[String]]
   -- リストからstringのリスト(？)をkeyとしCandidateをvalueとするmapを作成
-  -- let cndte = M.fromList $ read s1 :: M.Map [String] Candidate
-  let cndte = M.fromList [
-                (["text1","is","here","."],Candidate 0 0 0 0 0 0 0 0 0 0 0 "?")
-                ,(["text2","is","here","!"],Candidate 0 0 0 0 0 0 0 0 0 0 0 "?")
-                ,(["text3","is","this","document","."],Candidate 0 0 0 0 0 0 0 0 0 0 0 "?")
-              ]
+  let cndte = M.fromList $ read s1 :: M.Map [String] Candidate
   return (kwrds,cndte)
 
 runGP :: IO()

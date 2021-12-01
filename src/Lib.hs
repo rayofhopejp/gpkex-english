@@ -12,9 +12,12 @@ import qualified Data.Set as S
 import Data.List
 import Data.Maybe
 import System.Directory
+import NLP.POS
 
 someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+someFunc = do
+  tagger <- defaultTagger
+  print $ tagStr tagger "This is a sample sentence."
 
 someFunc2 :: IO ()
 someFunc2 = putStrLn "someFunc2"

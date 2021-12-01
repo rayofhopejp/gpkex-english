@@ -27,6 +27,7 @@ library
   exposed-modules:
       Config
       Config_template
+      GetPhrFreq
       GP
       Lib
   other-modules:
@@ -36,6 +37,7 @@ library
   build-depends:
       MonadRandom
     , base >=4.7 && <5
+    , chatter
     , containers
     , directory
     , genprog ==0.1.0.2
@@ -53,6 +55,7 @@ executable gpkex-english-exe
   build-depends:
       MonadRandom
     , base >=4.7 && <5
+    , chatter
     , containers
     , directory
     , genprog ==0.1.0.2
@@ -72,6 +75,7 @@ test-suite gpkex-english-test
   build-depends:
       MonadRandom
     , base >=4.7 && <5
+    , chatter
     , containers
     , directory
     , genprog ==0.1.0.2
