@@ -5,6 +5,6 @@ import GP
 import GetPhrFreq
 
 main :: IO ()
-main = runGP
--- main = runGetPhrFreq
+-- main = runGP
+main = runGetPhrFreq
 -- main = someFunc

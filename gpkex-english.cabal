@@ -27,6 +27,8 @@ library
   exposed-modules:
       Config
       Config_template
+      GetAnnotated
+      GetCandidates
       GetPhrFreq
       GP
       Lib
@@ -40,6 +42,7 @@ library
     , chatter
     , containers
     , directory
+    , filepath
     , genprog ==0.1.0.2
     , split
     , syb
@@ -58,6 +61,7 @@ executable gpkex-english-exe
     , chatter
     , containers
     , directory
+    , filepath
     , genprog ==0.1.0.2
     , gpkex-english
     , split
@@ -78,6 +82,7 @@ test-suite gpkex-english-test
     , chatter
     , containers
     , directory
+    , filepath
     , genprog ==0.1.0.2
     , gpkex-english
     , split

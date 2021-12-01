@@ -3,6 +3,7 @@ module GetPhrFreq
       runGetPhrFreq
     ) where
 
+import Config
 import Data.Char
 import Data.List
 import System.IO
@@ -10,10 +11,8 @@ import Data.List.Split
 import qualified Data.Map as M
 import qualified Data.Set as S
 import System.Directory
+import NLP.POS
 
-inDir = ""--HAS TO BE ADDED BEFORE COMPILING AND EXECUTING; example: "/home/user/Documents/document_set/"
-stopWordFile = ""--HAS TO BE ADDED BEFORE COMPILING AND EXECUTING; example: "stopwords.txt"
-morphLexicon = ""--HAS TO BE ADDED BEFORE COMPILING AND EXECUTING; example: "morphLexicon.txt"
 
 stemN = 5 :: Int
 takeNumber = 960 :: Int
@@ -90,6 +89,7 @@ stem xs     = map (take 5) xs
 getWordFreq :: [[String]] -> M.Map [String] Int
 getWordFreq = foldl (\map key -> M.insert (stem key) 1 map) M.empty
 
+-- タイトル.テキストの形にして返す。
 getTextOnly :: String -> String
 getTextOnly s = ttl ++ " . " ++ txt
   where txt = head $ splitOn "</body>" $ last $ splitOn "<body>" s
@@ -110,10 +110,11 @@ runGetPhrFreq = do
   sws <- readFile stopWordFile
   let stopW = S.fromList $ lines sws -- stopwordsのsetを作る
   pos <- readFile morphLexicon
-  -- morphlexiconの各行についてリスト化して左から畳み込みして
+  -- morphlexiconの各行についてリスト化して左から畳み込みして辞書を作る感じ？
   let lem = foldl (\m a' -> (getDict a' m)) M.empty $ lines pos
   let lemmas = foldl (\m a' -> (getLemma a' m)) M.empty $ lines pos
   fns <- getDirectoryContents inDir
+  -- xmlファイルのみを抽出
   let a = take takeNumber $ filterFiles fns
   let b = foldl (getFileText stopW lem lemmas) emptyMap a
   b' <- b

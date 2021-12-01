@@ -44,6 +44,7 @@ allow-newer: true
 extra-deps:
 - syz-0.2.0.0
 - genprog-0.1.0.2
+- filepath-1.4.2.1
 # for chatter(NLP.POS)
 - chatter-0.9.1.0
 - fullstop-0.1.4@sha256:80a3e382ef53551bb936e7da8b2825621df0ea169af1212debcb0a90010b30c8,2044
