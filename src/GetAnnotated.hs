@@ -18,9 +18,6 @@ import System.FilePath
 
 takeNumber = 1000 :: Int
 
-getTextOnly :: String -> String
-getTextOnly s = head $ splitOn "</slugline>" $ last $ splitOn "<slugline>" s
-
 splitText :: String -> String -> String -> [String]
 splitText chars word []     = [word]
 splitText []    _    _      = error "invalid stop char sequence"
@@ -30,9 +27,8 @@ splitText chars word (t:ts)
   | otherwise    = splitText chars (word ++ [toLower t]) ts
 
 makeTuples :: S.Set String -> String -> [[String]]
-makeTuples stopW = filter (removeStop stopW) . concat . map (filter (\ss -> ss /= [] && length ss <= 4) . map (stem . words) . splitText "!\"'()+.,;:?"
-  "") . splitText "|" "" 
-
+makeTuples stopW = filter (removeStop stopW) . concat . map (filter (\ss -> ss /= [] && length ss <= 4) . map (stem . words) . splitText "!\"'()+.,;:?\n"
+  "") . splitText "\n" ""
 stem2 :: String -> String
 stem2 "" = error "stemming empty string"
 stem2 s
@@ -52,15 +48,16 @@ runGetAnnotated = do
   fns <- getDirectoryContents inDirAnnotated
   let a = take takeNumber $ filterFiles fns
   forM a (processFiles stopW)
+  return ()
 
 processFiles stopW fn = do
   s <- readFile fn
-  let kws = makeTuples stopW $ getTextOnly s
+  let kws = makeTuples stopW $ s
   let nfn = outDirAnnotated ++ (snd $ splitFileName fn)
   writeFile nfn $ show kws
 
 filterFiles [] = error "empty folder"
-filterFiles fs = map (\f -> inDirAnnotated ++ f) $ sort $ filter (\f -> isSuffixOf ".xml" f) fs
+filterFiles fs = map (\f -> inDirAnnotated ++ f) $ sort $ filter (\f -> isSuffixOf ".txt" f) fs
 
 removeStop :: S.Set String -> [String] -> Bool
 removeStop stopW (a:[]) = not (S.member a stopW)

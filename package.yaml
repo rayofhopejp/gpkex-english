@@ -33,13 +33,26 @@ library:
   source-dirs: src
 
 executables:
-  gpkex-english-exe:
-    main:                Main.hs
+  prepare-run-gp:
+    main:                PrepareRunGP.hs
+    other-modules:       []
     source-dirs:         app
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -main-is PrepareRunGP
+    dependencies:
+    - gpkex-english
+  run-gp:
+    main:                RunGP.hs
+    other-modules:       []
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -main-is RunGP
     dependencies:
     - gpkex-english
 

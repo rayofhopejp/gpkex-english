@@ -12,11 +12,12 @@ Our paper : Prepareing...
 All of the programs are written in Haskell programming language. They have been tested and used on a macOS 11.5.2 operating system, using stack version 2.7.3 (lts-13.11,ghc-8.6.3).
 
 ## usage
+change Config_template to Config and write your file path.
 ```
 stack build
-stack exec gpkex-english-exe
+stack exec prepare-run-gp #prepare data
+stack exec run-gp #run genetic programming
 ```
-change Config_template to Config and write your file path.
 
 ## dataset
 In the document directory, each file contains a **tokenized** sentence.
