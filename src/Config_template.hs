@@ -1,6 +1,7 @@
 module Config_template
     (
       inDir,stopWordFile,morphLexicon,inDirP, inDirK, outDir,inDirCandidates,outDirCandidates,inDirAnnotated,outDirAnnotated,candidateFrequency
+      ,inDirExtract,outDirExtract
     ) where
 -- GetPhrFreq.hs
 inDir = ""--HAS TO BE ADDED BEFORE COMPILING AND EXECUTING; example: "/home/user/Documents/document_set/"
@@ -18,4 +19,6 @@ inDirAnnotated = inDirCandidates
 outDirAnnotated = inDirK
 -- kex.hs
 candidateFrequency = ""--HAS TO BE ADDED BEFORE COMPILING AND EXECUTING; example: "phraseFreq.txt"
+inDirExtract = ""--HAS TO BE ADDED BEFORE COMPILING AND EXECUTING; example: "/home/user/Documents/test_set/"
+outDirExtract = ""--HAS TO BE ADDED BEFORE COMPILING AND EXECUTING; example: "/home/user/Documents/extracted_keywords/"
 -- todo: "praseFreq.txt" -> candidateFrequency

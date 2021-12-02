@@ -18,6 +18,7 @@ import Data.Maybe
 import System.Directory
 import Data.List.Split
 import System.Environment
+import System.FilePath
 
 --------------------------
 --GENPROG
@@ -228,23 +229,28 @@ takeSample = 60 :: Int
 runKex = do
   args <- getArgs --コマンドライン引数を取得
   let tr = head $ args --コマンドライン引数の先頭の文字列は木構造のファイル名
-  let fn = head $ tail args -- コマンドライン引数の最後の文字列の
-  print tr
-  print fn
+  fns' <- getDirectoryContents inDirExtract
+  let fns = filterFiles fns'
   sws <- readFile stopWordFile
-  -- pos <- readFile morphLexicon
   s' <- readFile candidateFrequency
   tree' <- readFile tr
-  -- let lem = foldl (\m a' -> (getDict a' m)) M.empty $ lines pos
   let stopW = S.fromList $ lines sws
   let tree'' = read $ tree' :: (String,Float)
   let tree = read $ fst $ tree'' :: E
   let pfq = M.fromList $ read s' -- phrase frequency
+  forM fns (processFiles stopW tree pfq)
+  return ()
+
+processFiles stopW tree pfq fn = do
   txt <- readFile fn
-  -- let ttl = head $ lines txt
   let phr = getPhrases $ filter (\ph -> filterPOS ph) $ filter (removeStop stopW) $ makeTuples txt
   let len = M.size phr
   let owp = onlyOneword phr pfq len
   let can = makeCandidates phr (takeBest owp) pfq len
-  let mRes = unlines $ rankCandidates (eval tree) can 10
-  putStrLn mRes
+  let mRes = rankCandidates (eval tree) can 10
+  let nfn = outDirExtract ++ (snd $ splitFileName fn)
+  writeFile nfn $ unlines mRes
+
+filterFiles [] = error "empty folder"
+filterFiles fs = map (\f -> inDirExtract++ f) $ sort $ filter (\f -> isSuffixOf ".txt" f) fs
+  
