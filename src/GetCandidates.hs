@@ -19,7 +19,7 @@ import System.FilePath
 
 stemN = 5 :: Int
 rareNumber = 10 :: Int
-takeNumber = 960 :: Int
+takeNumber = 100000 :: Int --default:960
 
 data Phrase = Phrase {
   pWords :: [String],

@@ -49,6 +49,7 @@ library
     , genprog ==0.1.0.2
     , split
     , syb
+    , text
   default-language: Haskell2010
 
 executable evaluation
@@ -67,6 +68,7 @@ executable evaluation
     , gpkex-english
     , split
     , syb
+    , text
   default-language: Haskell2010
 
 executable extraction
@@ -85,6 +87,7 @@ executable extraction
     , gpkex-english
     , split
     , syb
+    , text
   default-language: Haskell2010
 
 executable prepare-run-gp
@@ -103,6 +106,7 @@ executable prepare-run-gp
     , gpkex-english
     , split
     , syb
+    , text
   default-language: Haskell2010
 
 executable run-gp
@@ -121,6 +125,7 @@ executable run-gp
     , gpkex-english
     , split
     , syb
+    , text
   default-language: Haskell2010
 
 test-suite gpkex-english-test
@@ -142,4 +147,5 @@ test-suite gpkex-english-test
     , gpkex-english
     , split
     , syb
+    , text
   default-language: Haskell2010

@@ -28,7 +28,7 @@ dependencies:
 - split
 - chatter
 - filepath
-
+- text
 library:
   source-dirs: src
 

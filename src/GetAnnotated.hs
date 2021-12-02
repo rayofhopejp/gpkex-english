@@ -16,7 +16,7 @@ import System.Directory
 import System.FilePath
 
 
-takeNumber = 1000 :: Int
+takeNumber = 100000 :: Int -- default:1000
 
 splitText :: String -> String -> String -> [String]
 splitText chars word []     = [word]

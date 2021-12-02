@@ -16,7 +16,7 @@ import NLP.POS
 
 
 stemN = 5 :: Int
-takeNumber = 960 :: Int
+takeNumber = 100000 :: Int -- default:960
 
 takeTuple :: [String] -> [[String]]
 takeTuple [] = []

@@ -19,9 +19,11 @@ import Data.List
 import Data.List.Split
 import Data.Maybe
 import System.Directory
+import Text.Read
+import qualified Data.Text as T
+import qualified Data.Text.IO as TIO
 
-
-takeNumber = 300 :: Int--can be changed, 300 documents produces good results in reasonably short time
+takeNumber = 100000 :: Int--can be changed, 300 documents produces good results in reasonably short time
 infi = 1 / 0
 
 data E = Plus E E
@@ -187,13 +189,22 @@ newFileName fs = replicate (4 - length mnr) '0' ++ mnr ++ ".txt"
 newFileName' :: [String] -> String
 newFileName' fs = newFileName $ filter (\f -> isSuffixOf ".txt" f) fs
 
+
+readFileStrict :: FilePath -> IO String
+readFileStrict = fmap T.unpack . TIO.readFile
+
 processFiles fn = do
-  s1 <- readFile $ inDirP ++ fn
-  s2 <- readFile $ inDirK ++ fn
-  let kwrds = read s2 :: [[String]]
-  -- リストからstringのリスト(？)をkeyとしCandidateをvalueとするmapを作成
-  let cndte = M.fromList $ read s1 :: M.Map [String] Candidate
-  return (kwrds,cndte)
+  s1 <- readFileStrict ( inDirP ++ fn )
+  s2 <- readFileStrict ( inDirK ++ fn )
+  let maybekwrds = readMaybe s2 :: Maybe [[String]]
+  let maybecndte = readMaybe s1 :: Maybe [([String],Candidate)]
+  case maybekwrds of
+    Nothing -> error "error in keywords"
+    Just kwrds -> case maybecndte of
+      Nothing -> error "error in candidates"
+      Just cndte -> do
+        return (kwrds,M.fromList cndte)
+  
 
 runGP :: IO()
 runGP = do
