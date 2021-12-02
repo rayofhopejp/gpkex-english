@@ -17,6 +17,8 @@ change Config_template to Config and write your file path.
 stack build
 stack exec prepare-run-gp #prepare data
 stack exec run-gp #run genetic programming
+stack exec extraction <tree filename> #extract keyphrases
+stack exec evaluation #evaluate results (optional)
 ```
 
 ## dataset
