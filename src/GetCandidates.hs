@@ -4,6 +4,7 @@ module GetCandidates
     ) where
 
 import Config
+import Operations
 import Data.Char
 import Data.List
 import System.IO
@@ -50,9 +51,6 @@ getLemma s m = M.insert fi le m
         fi = map toLower $ head w
         le = map (\c -> toLower c) $ head $ tail $ w
 
--- todo:見出し語にする操作
-lemmatize :: [String] ->　[String]
-lemmatize a = a
 
 
 getComb :: [String] -> [String] -> M.Map String [String] -> [String]
@@ -66,12 +64,6 @@ getComb ss l m = getComb (tail ss) con m
         fin (Just x) = x
         fin (Nothing) = ["X"]
         con = concat $ map (\el' -> map (\l' -> l' ++ el') l) el
-
--- todo:後でPOSでフィルターをかける
--- ここで品詞分解を使いたい
-posPat = ["N","AN","NN","X","NSN","V"]
-filterPOS :: [String] -> Bool
-filterPOS _ = True
   
 
 splitText :: String -> String -> [String]
@@ -132,6 +124,10 @@ onlyOneword m dfm l = M.foldrWithKey (\k o s -> S.insert (tfidf k o,w o) s) S.em
         getdfm k (Nothing)    = error $ "only" ++ show k
         getdfm k (Just a)     = a
 
+        
+takeBest :: S.Set (Float, String) -> S.Set String
+takeBest s = S.fromList $ map (\(f,s') -> s') $ take rareNumber $ reverse $ S.toList s
+
 makeCandidates :: M.Map [String] Phrase -> S.Set String -> M.Map [String] Int -> Int -> M.Map [String] Candidate
 makeCandidates phrases toponeword dfm doclen = M.mapWithKey (\k a -> mkC k a) phrases
   where tf (Phrase _ l)       = (fromIntegral $ length l) / (fromIntegral doclen)
@@ -148,12 +144,9 @@ makeCandidates phrases toponeword dfm doclen = M.mapWithKey (\k a -> mkC k a) ph
         rare k                | length k == 1 = length $ filter (\k' -> S.member k' toponeword) k
                               | otherwise     = length $ filter (\k' -> S.member k' toponeword') k
         toponeword'           = S.map (\str -> take 5 str) toponeword
-        titl k                = 0 --todo:titleをCandidateから消す
+        titl k                = 0 -- todo: delete title from Candidates
         orig (Phrase w _)     = unwords w
         mkC k a = Candidate (tf a) (idf k) ((tf a) * log(idf k)) (cfirst a) (clast a) (first a) (secon a) (third a) (numb k) (rare k) (titl k) (orig a)
-        
-takeBest :: S.Set (Float, String) -> S.Set String
-takeBest s = S.fromList $ map (\(f,s') -> s') $ take rareNumber $ reverse $ S.toList s
 
 -- main
 runGetCandidates = do

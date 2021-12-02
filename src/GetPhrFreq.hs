@@ -4,6 +4,7 @@ module GetPhrFreq
     ) where
 
 import Config
+import Operations
 import Data.Char
 import Data.List
 import System.IO
@@ -16,16 +17,6 @@ import NLP.POS
 
 stemN = 5 :: Int
 takeNumber = 960 :: Int
-
--- todo:見出し語にする操作
-lemmatize :: [String] ->　[String]
-lemmatize a = a
-
--- todo:後でPOSでフィルターをかける
--- ここで品詞分解を使いたい
-posPat = ["N","AN","NN","X","NSN","V"]
-filterPOS :: [String] -> Bool
-filterPOS _ = True
 
 takeTuple :: [String] -> [[String]]
 takeTuple [] = []

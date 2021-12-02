@@ -6,6 +6,7 @@ module GP
     ) where
 
 import Config
+import Operations
 import GenProg
 import GenProg.GenExpr
 import GenProg.GenExpr.Data
@@ -74,7 +75,6 @@ eval Length c  = Just (cNumber c)
 eval Rare c    = Just (cRare c)
 eval Title c   = Just (cTitle c)
 
--- todo: this must be changed
 {- 
 instance GenExpr E where
   -- nodeIndices :: e -> ([Int], [Int])

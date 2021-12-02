@@ -55,6 +55,17 @@ executables:
     - -main-is RunGP
     dependencies:
     - gpkex-english
+  extraction:
+    main:                Extraction.hs
+    other-modules:       []
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -main-is Extraction
+    dependencies:
+    - gpkex-english
 
 tests:
   gpkex-english-test:
