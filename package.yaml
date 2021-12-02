@@ -66,6 +66,17 @@ executables:
     - -main-is Extraction
     dependencies:
     - gpkex-english
+  evaluation:
+    main:                Evaluation.hs
+    other-modules:       []
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -main-is Evaluation
+    dependencies:
+    - gpkex-english
 
 tests:
   gpkex-english-test:

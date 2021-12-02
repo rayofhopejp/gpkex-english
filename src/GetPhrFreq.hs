@@ -75,7 +75,7 @@ runGetPhrFreq = do
   let a = take takeNumber $ filterFiles fns
   let b = foldl (getFileText stopW) emptyMap a
   b' <- b
-  writeFile "phraseFreq.txt" $ show $ M.toList b'
+  writeFile candidateFrequency $ show $ M.toList b'
 
 emptyMap :: IO (M.Map [String] Int)
 emptyMap = return M.empty

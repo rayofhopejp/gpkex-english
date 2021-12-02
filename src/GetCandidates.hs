@@ -153,7 +153,7 @@ runGetCandidates = do
   sws <- readFile stopWordFile
   let stopW = S.fromList $ lines sws
   fns <- getDirectoryContents inDirCandidates
-  s' <- readFile "phraseFreq.txt"
+  s' <- readFile candidateFrequency
   let pfq = M.fromList $ read s' -- key:["apple","watch"] value:1
   let a = take takeNumber $ filterFiles fns
   forM a (processFiles stopW pfq)
