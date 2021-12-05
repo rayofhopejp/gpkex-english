@@ -15,6 +15,11 @@ import qualified Data.Map as M
 import qualified Data.Set as S
 import System.Directory
 import System.FilePath
+import qualified Data.Text as T
+import qualified Data.Text.IO as TIO
+
+readFileStrict :: FilePath -> IO String
+readFileStrict = fmap T.unpack . TIO.readFile
 
 
 stemN = 5 :: Int
@@ -108,6 +113,7 @@ getTitle :: String -> String
 getTitle s = head $ splitOn "</title>" $ last $ splitOn "<title>" s
 
 
+-- [["apple","watch"]]->M.Map ["apple watch"]　Phrase{pWords=,pPos=,}
 getPhrases :: [[String]] -> M.Map [String] Phrase
 getPhrases s = foldl (\map (i,c) -> M.insertWith addPhrase (stem c) (Phrase c [i]) map) M.empty cand
   where cand = zip [1..] s
@@ -163,10 +169,10 @@ filterFiles [] = error "empty folder"
 filterFiles fs = map (\f -> inDirCandidates ++ f) $ sort $ filter (\f -> isSuffixOf ".txt" f) fs
 
 processFiles stopW pfq fn = do
-  s <- readFile fn
+  s <- readFileStrict fn
   let phr = getPhrases $ map (\ph -> lemmatize ph) $ filter (\ph -> filterPOS ph) $ filter (removeStop stopW) $ makeTuples s
   let len = M.size phr
-  let owp = onlyOneword phr pfq len
+  let owp = onlyOneword phr pfq len -- owpは
   let can = makeCandidates phr (takeBest owp) pfq len
   let nfn = outDirCandidates ++ (snd $ splitFileName fn)
   writeFile nfn $ show $  M.toList can

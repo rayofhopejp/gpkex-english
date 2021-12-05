@@ -13,6 +13,11 @@ import qualified Data.Map as M
 import qualified Data.Set as S
 import System.Directory
 import NLP.POS
+import qualified Data.Text as T
+import qualified Data.Text.IO as TIO
+
+readFileStrict :: FilePath -> IO String
+readFileStrict = fmap T.unpack . TIO.readFile
 
 
 stemN = 5 :: Int
@@ -60,7 +65,7 @@ filterFiles [] = error "empty folder"
 filterFiles fs = map (\f -> inDir ++ f) $ sort $ filter (\f -> isSuffixOf ".txt" f) fs
 
 getFileText stopW m' fn = do
-  s <- readFile fn -- "this is document !"とかを読む
+  s <- readFileStrict fn -- "this is document !"とかを読む
   m <- m' --多分これは変えないですむ
   let nm = getWordFreq $ map (\ph -> lemmatize ph) $ filter (\ph -> filterPOS ph) $ filter (removeStop stopW) $ makeTuples $ s
   return $ M.unionWith (+) m nm

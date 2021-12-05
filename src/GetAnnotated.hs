@@ -14,7 +14,11 @@ import qualified Data.Map as M
 import qualified Data.Set as S
 import System.Directory
 import System.FilePath
+import qualified Data.Text as T
+import qualified Data.Text.IO as TIO
 
+readFileStrict :: FilePath -> IO String
+readFileStrict = fmap T.unpack . TIO.readFile
 
 takeNumber = 100000 :: Int -- default:1000
 
@@ -51,7 +55,7 @@ runGetAnnotated = do
   return ()
 
 processFiles stopW fn = do
-  s <- readFile fn
+  s <- readFileStrict fn
   let kws = makeTuples stopW $ s
   let nfn = outDirAnnotated ++ (snd $ splitFileName fn)
   writeFile nfn $ show kws
