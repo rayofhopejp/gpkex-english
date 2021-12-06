@@ -47,6 +47,9 @@ data Candidate = Candidate {
   cNumber :: Int,
   cRare   :: Int,
   cNoun   :: Int, 
+  cAdv    :: Int,
+  cVerb   :: Int,
+  cAdj    :: Int,
   -- todo: change here while you change candidate
   cOrig   :: String } deriving (Show, Read, Eq, Ord)
 
@@ -138,13 +141,16 @@ takeBest s = S.fromList $ map (\(f,s') -> s') $ take rareNumber $ reverse $ S.to
 
 -- todo: get noun num
 nounlist = [NC.NN, NC.NNP, NC.NNPS, NC.NNS]
+adverblist = [NC.RB, NC.RBR, NC.RBS]
+verblist = [NC.VB, NC.VBD, NC.VBG, NC.VBN, NC.VBP, NC.VBZ]
+adjlist = [NC.JJ, NC.JJR, NC.JJS]
 taggedSenttoPoslist :: NT.TaggedSentence NC.Tag->  [NT.POS NC.Tag]
 taggedSenttoPoslist (NT.TaggedSent xs) =  xs
 taggedSentlisttoPoslist ::  [NT.TaggedSentence NC.Tag] ->  [NT.POS NC.Tag]
 taggedSentlisttoPoslist [] = []
 taggedSentlisttoPoslist xs  =  concat $ map taggedSenttoPoslist xs
-getNounnum :: [String] -> Int
-getNounnum s = length $ filter (\x -> x `elem` nounlist)$ map NT.posTag $ taggedSentlisttoPoslist $ N.tag tagger $ T.pack $ intercalate " " s
+getnum :: [NC.Tag] -> [String] -> Int
+getnum lst s = length $ filter (\x -> x `elem` lst)$ map NT.posTag  $ taggedSentlisttoPoslist $ N.tag tagger $ T.pack $ intercalate " " s
   where tagger = unsafePerformIO　N.defaultTagger
 -- todo:change here while you change candidate
 makeCandidates :: M.Map [String] Phrase -> S.Set String -> M.Map [String] Int -> Int -> M.Map [String] Candidate
@@ -162,10 +168,13 @@ makeCandidates phrases toponeword dfm doclen = M.mapWithKey (\k a -> mkC k a) ph
         numb k                = length k
         rare k                | length k == 1 = length $ filter (\k' -> S.member k' toponeword) k
                               | otherwise     = length $ filter (\k' -> S.member k' toponeword') k
-        noun k                = getNounnum k --todo:change here
+        noun k                = getnum nounlist k
+        adverb k              = getnum adverblist k
+        verb k                = getnum verblist k
+        adj k                 = getnum adjlist k
         toponeword'           = S.map (\str -> take 5 str) toponeword
         orig (Phrase w _)     = unwords w
-        mkC k a = Candidate (tf a) (idf k) ((tf a) * log(idf k)) (cfirst a) (clast a) (first a) (secon a) (third a) (numb k) (rare k) (noun k) (orig a)
+        mkC k a = Candidate (tf a) (idf k) ((tf a) * log(idf k)) (cfirst a) (clast a) (first a) (secon a) (third a) (numb k) (rare k) (noun k) (adverb k) (verb k) (adj k) (orig a)
 
 -- main
 runGetCandidates = do

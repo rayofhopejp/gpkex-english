@@ -45,6 +45,9 @@ data E = Plus E E
        | Length
        | Rare
        | Noun 
+       | Adv
+       | Verb
+       | Adj
        -- todo: change here to add new attribute 
        deriving (Typeable,Data,Eq,Show)
 
@@ -77,12 +80,15 @@ eval NumberT c = Just (cT c)
 eval Length c  = Just (cNumber c)
 eval Rare c    = Just (cRare c)
 eval Noun c    = Just (cNoun c)
+eval Adv c     = Just (cAdv c)
+eval Verb c    = Just (cVerb c)
+eval Adj c     = Just (cAdj c)
 -- todo: change when you change E.
 
 instance GenProg (Rand StdGen) E where
   terminal = do
-    r<-getRandomR (0,10) -- todo: change when you change E. [low,hi].
-    return $ [Tf,Idf,Tfidf,First,Last,NumberF,NumberS,NumberT,Length,Rare,Noun] !! r
+    r<-getRandomR (0,13) -- todo: change when you change E. [low,hi].
+    return $ [Tf,Idf,Tfidf,First,Last,NumberF,NumberS,NumberT,Length,Rare,Noun,Adv,Verb,Adj] !! r
   nonterminal = do
     r <- getRandomR (0,7)
     [liftM2 Plus terminal terminal,
@@ -114,6 +120,9 @@ data Candidate = Candidate {
   cNumber :: Float,
   cRare   :: Float,
   cNoun   :: Float, 
+  cAdv    :: Float,
+  cVerb   :: Float,
+  cAdj    :: Float,
   -- todo: change here when you change candidate
   cOrig   :: String } deriving (Show, Read, Eq, Ord)
 
