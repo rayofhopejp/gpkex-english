@@ -1,7 +1,7 @@
 module PrepareRunGP where
 
 import GetPhrFreq
-import GetCandidates
+import GetCandidates_addpos
 import GetAnnotated
 
 main :: IO ()

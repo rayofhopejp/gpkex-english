@@ -3,3 +3,5 @@
 data/*
 */Config.hs
 phraseFreq.txt
+.ipynb_checkpoints
+*.ipynb

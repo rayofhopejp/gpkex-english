@@ -1,6 +1,6 @@
 module Extraction where
 
-import Kex
+import Kex_addpos
 
 main :: IO ()
 main = runKex

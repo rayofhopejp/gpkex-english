@@ -30,9 +30,12 @@ library
       Evaluate
       GetAnnotated
       GetCandidates
+      GetCandidates_addpos
       GetPhrFreq
       GP
+      GP_addpos
       Kex
+      Kex_addpos
       Lib
       Operations
   other-modules:
