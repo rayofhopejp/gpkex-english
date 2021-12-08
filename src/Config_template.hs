@@ -2,6 +2,7 @@ module Config_template
     (
       inDir,stopWordFile,inDirP, inDirK, outDir,inDirCandidates,outDirCandidates,inDirAnnotated,outDirAnnotated,candidateFrequency
       ,inDirExtract,outDirExtract,generatedSamples,trueSamples,evaluateAt
+      ,inDirP2,inDirK2
     ) where
 
 -- GetPhrFreq.hs
@@ -25,3 +26,6 @@ outDirExtract = ""--HAS TO BE ADDED BEFORE COMPILING AND EXECUTING; example: "/h
 generatedSamples = outDirExtract
 trueSamples = ""--HAS TO BE ADDED BEFORE COMPILING AND EXECUTING; example: "/home/user/Documents/lifehacker_test_keywords/"
 evaluateAt = 5 :: Int -- Precision@evaluateAt, recall@evaluateAt, F1@evaluateAt
+-- transfer learning
+inDirP2 = ""--HAS TO BE ADDED BEFORE COMPILING AND EXECUTING; example: "/home/user/Documents/l_traindata_inDirP/"
+inDirK2 = ""--HAS TO BE ADDED BEFORE COMPILING AND EXECUTING; example: "/home/user/Documents/l_traindata_inDirK/"

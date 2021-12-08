@@ -34,6 +34,7 @@ library
       GetPhrFreq
       GP
       GP_addpos
+      GP_transfer
       Kex
       Kex_addpos
       Lib

@@ -1,6 +1,6 @@
 module RunGP where
 
-import GP_addpos
+import GP_transfer
 
 main :: IO ()
 main = runGP

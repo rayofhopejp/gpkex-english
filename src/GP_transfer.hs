@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveDataTypeable, FlexibleInstances, MultiParamTypeClasses #-}
 
-module GP_addpos
+module GP_transfer
     (
       runGP
     ) where
@@ -180,25 +180,41 @@ processFiles fn = do
       Nothing -> error "error in candidates"
       Just cndte -> do
         return (kwrds,M.fromList cndte)
+processFiles2 fn = do
+  s1 <- readFileStrict ( inDirP2 ++ fn )
+  s2 <- readFileStrict ( inDirK2 ++ fn )
+  let maybekwrds = readMaybe s2 :: Maybe [[String]]
+  let maybecndte = readMaybe s1 :: Maybe [([String],Candidate)]
+  case maybekwrds of
+    Nothing -> error "error in keywords"
+    Just kwrds -> case maybecndte of
+      Nothing -> error "error in candidates"
+      Just cndte -> do
+        return (kwrds,M.fromList cndte)
   
 
 runGP :: IO()
 runGP = do
   -- get all files in the inDirP
   fns <- getDirectoryContents inDirP 
+  fns2 <- getDirectoryContents inDirP2
   -- .txtだけ抽出してソート、takeNumberだけ抽出
   let a = take takeNumber $ filterFiles fns
+  let b = take takeNumber $ filterFiles fns2
   -- 全.txtに対してprocessFilesを適用してリストに
   -- 各ファイルを読み込み、[(キーワードのリスト、文章のマップ)]をcandsに束縛
-  cands <- forM a (processFiles)
+  cands <- forM a processFiles
+  cands2 <- forM b processFiles2
   -- get all files in the outDir
   trs <- getDirectoryContents outDir
-  -- outDirの各ファイルを読み込み、
   let nfn = outDir ++ newFileName' trs
   -- fitnessを設定(その他のパラメータはdefault)
   let params = defaultEvolParams { fitness = myFitness cands}
+  let params2 = defaultEvolParams { fitness = myFitness cands2}
   g <- getStdGen --get a roundom generator with random seeds
-  -- evolveTraceは初期集団を作って、終了まで進化を繰り返す。成功した進化状態を返す。
-  let trace = evalRand (evolveTrace params {terminate=tGeneration 50, elitists = 1, mProb = 0.05}) g--parameters can be changed here
+  -- inDirP(K)2のファイルを使って先に学習
+  let population = pop $ last $ evalRand ( evolveTrace params2 {terminate=tGeneration 50, elitists = 1, mProb = 0.05}) g
+  -- traceからさらに学習
+  let trace = evalRand (evolveTraceFrom params {terminate=tGeneration 50, elitists = 1, mProb = 0.05} population) g
   let i = cachedBest $ last trace
   writeFile nfn $ show (show $ unInd i, sFitness i)
