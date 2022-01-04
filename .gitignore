@@ -5,3 +5,4 @@ data/*
 phraseFreq.txt
 .ipynb_checkpoints
 *.ipynb
+memo.md
